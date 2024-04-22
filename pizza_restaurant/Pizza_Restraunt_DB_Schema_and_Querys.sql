@@ -22,13 +22,10 @@ CREATE TABLE customers (
 -- ORDERS table
 CREATE TABLE orders (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    order_placed TIMESTAMP DEFAULT NOW(),
+    order_date_time TIMESTAMP DEFAULT NOW(),
     customer_id INT NOT NULL,
     FOREIGN KEY(customer_id) REFERENCES customers(id)
 );
-
-ALTER TABLE orders
-CHANGE COLUMN order_placed order_date_time TIMESTAMP DEFAULT NOW();
 
 -- PIZZAS table
 CREATE TABLE pizzas (
@@ -68,15 +65,15 @@ FROM customers;
 
 -- INSERT INTO orders
 -- ------
-INSERT INTO orders (orders.id, orders.order_placed, orders.customer_id)
+INSERT INTO orders (orders.id, orders.order_date_time, orders.customer_id)
 VALUES (1, '2023-09-10 09:47:00', 1),
        (2, '2023-09-10 13:20:00', 2),
        (3, '2023-09-10 09:47:00', 1),
        (4, '2023-10-10 10:37:00', 2);
 
 SELECT * FROM orders;
--- Display: order_id | order_placed | customer_id | customer_name | ORDER BY order_id
-SELECT orders.id AS order_id, DATE_FORMAT(orders.order_placed, '%M %d, %Y %r') AS order_date_time,
+-- Display: order_id | order_date_time | customer_id | customer_name | ORDER BY order_id
+SELECT orders.id AS order_id, DATE_FORMAT(orders.order_date_time, '%M %d, %Y %r') AS order_date_time,
        orders.customer_id, CONCAT(customers.first_name, SPACE(1), customers.last_name) AS customer_name FROM orders
 JOIN customers ON orders.customer_id = customers.id
 ORDER BY order_id;
@@ -117,7 +114,7 @@ SELECT
     CONCAT('(', SUBSTRING(phone_number, 1, 3), ') ',
               SUBSTRING(phone_number, 4, 3), '-',
               SUBSTRING(phone_number, 7)) AS phone_number,
-    DATE_FORMAT(orders.order_placed, '%M %d, %Y at %r') AS order_date_time,
+    DATE_FORMAT(orders.order_date_time, '%M %d, %Y at %r') AS order_date_time,
     GROUP_CONCAT(CONCAT(items_ordered.quantity, 'x ', pizzas.name) SEPARATOR ', ') AS pizza_order
 FROM
     orders
@@ -159,7 +156,7 @@ ORDER BY
 --    but also by date so they can see how much each customer is ordering on which date.
 SELECT
     CONCAT(customers.first_name, ' ', customers.last_name) AS customer_name,
-    DATE_FORMAT(orders.order_placed, '%M %d, %Y at %r') AS order_date,
+    DATE_FORMAT(orders.order_date_time, '%M %d, %Y at %r') AS order_date_time,
     CONCAT('$', FORMAT(SUM(items_ordered.quantity * pizzas.price), 2)) AS total_spent
 FROM
     customers
@@ -170,9 +167,9 @@ JOIN
 JOIN
     pizzas ON items_ordered.pizza_id = pizzas.id
 GROUP BY
-    customers.id, orders.order_placed
+    customers.id, orders.order_date_time
 ORDER BY
-    customer_name, order_date;
+    customer_name, order_date_time;
 -- -----------------------------------------------------
 
 
