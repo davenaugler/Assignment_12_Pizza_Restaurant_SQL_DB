@@ -27,6 +27,9 @@ CREATE TABLE orders (
     FOREIGN KEY(customer_id) REFERENCES customers(id)
 );
 
+ALTER TABLE orders
+CHANGE COLUMN order_placed order_date_time TIMESTAMP DEFAULT NOW();
+
 -- PIZZAS table
 CREATE TABLE pizzas (
     id INT PRIMARY KEY AUTO_INCREMENT,
